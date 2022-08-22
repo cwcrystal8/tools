@@ -200,16 +200,7 @@ class TimelineExplorer extends Component<
     );
 
     const locations = [...locationSet];
-    const labels = await Promise.all(
-        locations.map(async (location) => {
-          const label =
-             (location.startsWith('dcid:') ?
-               await getName(location.slice(5)) :
-               await getName(location)
-             );
-          return label;
-        }),
-    );
+    const labels = await getName(locations);
     return locations.map((location, i) => {
       return {
         value: location,

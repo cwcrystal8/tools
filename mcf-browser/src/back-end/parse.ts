@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Series, SeriesObject, TimeDataObject} from './time-series';
+import {Series, SeriesObject, TimeDataObject, ValueObject} from './time-series';
 import {ParseMcf} from './parse-mcf';
 import {ParseTmcf} from './parse-tmcf';
 import {ParsingError, ERROR_MESSAGES} from './utils';
@@ -128,30 +128,38 @@ async function getNodes(fileList: Blob[]) : Promise<ParseFileResponse> {
     } else if (fileExt === 'csv') {
       if (tmcfFile) {
         const tmcfFileName = (tmcfFile as File).name;
-        const tmcfOut = await ParseTmcf.generateMcf(tmcfFile, file).then(
-            (mcf) => {
-              const mcfParser = new ParseMcf(
-                  tmcfFileName + '&' + fileName,
-              );
-              return mcfParser.parseMcfStr(mcf as string);
-            },
-        );
 
-        const datapoints = await ParseTmcf.generateDataPoints(tmcfFile, file);
+        const start = performance.now();
+        const parsedCsv = await ParseTmcf.parseTmcfAndCsv(tmcfFile, file);
+        const mid = performance.now();
+
+        console.log(`\tparseTmcfAndCsv: ${(mid - start) / 1000}`);
+
+        const datapoints = parsedCsv.datapoints;
         finalReturn['datapoints'] = mergeDataPoints(
             finalReturn['datapoints'],
             datapoints,
         );
 
-        if (tmcfOut['errMsgs'].length !== 0) {
-          finalReturn['errMsgs'] = finalReturn['errMsgs'].concat({
-            file: tmcfFileName,
-            errs: tmcfOut['errMsgs'],
-          });
-        }
-        finalReturn['localNodes'] = finalReturn['localNodes'].concat(
-            tmcfOut['localNodes'],
+        console.log(`\tmergeDatapoints: ${(performance.now() - mid) / 1000} `);
+
+        const mcfs = parsedCsv.otherMcfs;
+        const mcfParser = new ParseMcf(
+            tmcfFileName + '&' + fileName,
         );
+        for (const mcf of mcfs) {
+          const parsedMcf = mcfParser.parseMcfStr(mcf as string);
+
+          if (parsedMcf['errMsgs'].length !== 0) {
+            finalReturn['errMsgs'] = finalReturn['errMsgs'].concat({
+              file: tmcfFileName,
+              errs: parsedMcf['errMsgs'],
+            });
+          }
+          finalReturn['localNodes'] = finalReturn['localNodes'].concat(
+              parsedMcf['localNodes'],
+          );
+        }
       }
     }
   }
@@ -231,9 +239,10 @@ function parseSeries(facet: string, values: SeriesObject) : ParseSeriesOutput {
 
   const data = [];
   for (const date of Object.keys(values)) {
+    const datapoint = values[date] as ValueObject;
     data.push({
       x: date,
-      y: values[date] as number,
+      y: datapoint.value as number,
     });
   }
 

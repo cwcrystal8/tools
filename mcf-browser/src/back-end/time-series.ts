@@ -34,13 +34,18 @@ type DataPoint = {
   y: number;
 };
 
+type ValueObject = {
+  value: number | undefined;
+  mcf: string;
+};
+
 type SeriesObject = {
-  [date: string]: number | undefined;
-}
+  [date: string]: ValueObject | undefined;
+};
 
 type TimeDataObject = {
   [facet: string]: SeriesObject | undefined;
-}
+};
 
 /** Class representation of a single series */
 class Series {
@@ -243,4 +248,4 @@ class Series {
 
 export {ID_DELIMITER, Series};
 
-export type {SeriesObject, TimeDataObject};
+export type {SeriesObject, TimeDataObject, ValueObject};

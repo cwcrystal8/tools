@@ -36,11 +36,17 @@ type ReadFileListResponse = {
  *  nodes and any parsing error message objects.
  */
 async function readFileList(fileList: Blob[]) : Promise<ReadFileListResponse> {
+  const start = performance.now();
   // Get parsing errors and nodes
   const nodes = await getNodes(fileList);
+  const mid = performance.now();
+  console.log(`getNodes: ${(mid - start) / 1000}`);
 
   // Get timeData
   const timeData = getTimeData(nodes.datapoints);
+  const end = performance.now();
+  console.log(`getTimeData: ${(end - mid)/ 1000}`);
+
   return {
     localNodes: nodes.localNodes,
     datapoints: nodes.datapoints,
