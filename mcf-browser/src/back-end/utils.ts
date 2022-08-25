@@ -66,8 +66,10 @@ interface NameResponse {
 async function getRemotePropertyLabels(dcid: string)
   : Promise<PropertyLabelResponse> {
   // Get inward and outward property labels
-  const outTargetUrl = `${API_ROOT}/v1/properties/out/${dcid}`;
-  const inTargetUrl = `${API_ROOT}/v1/properties/in/${dcid}`;
+  const outTargetUrl = `${API_ROOT}/v1/properties/out/${dcid}` +
+      `?key=${process.env.IMPORT_BROWSER_DC_API_KEY}`;
+  const inTargetUrl = `${API_ROOT}/v1/properties/in/${dcid}` +
+      `?key=${process.env.IMPORT_BROWSER_DC_API_KEY}`;
 
   const [inPropertyLabels, outPropertyLabels] = await Promise.all([
     fetch(inTargetUrl)
@@ -99,7 +101,8 @@ async function getRemotePropertyValues(
 ) : Promise<DCPropertyValueResponse[]> {
   const direction = isInverse ? 'in' : 'out';
   const targetUrl =
-      `${API_ROOT}/v1/property/values/${direction}/${dcid}/${label}`;
+      `${API_ROOT}/v1/property/values/${direction}/${dcid}/${label}` +
+      `?key=${process.env.IMPORT_BROWSER_DC_API_KEY}`;
 
   return fetch(targetUrl)
       .then((res) => res.json())
@@ -151,7 +154,8 @@ function getValueFromValueObj(valueObj: DCPropertyValueResponse)
  *     Data Commons Knowledge Graph.
  */
 async function doesExistsInKG(dcid: string) : Promise<boolean> {
-  const url = `${API_ROOT}/v1/property/values/out/${dcid}/typeOf`;
+  const url = `${API_ROOT}/v1/property/values/out/${dcid}/typeOf` +
+  `?key=${process.env.IMPORT_BROWSER_DC_API_KEY}`;
 
   // expected response if dcid exists is {"values":"[...]}
   // expected response if dcid does not exist is {}
@@ -187,6 +191,7 @@ async function getName(entities: string[]) {
   const data = {
     'property': 'name',
     'entities': entities,
+    'key': process.env.IMPORT_BROWSER_DC_API_KEY,
   };
   const options = {
     method: 'POST',

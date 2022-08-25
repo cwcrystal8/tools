@@ -83,15 +83,15 @@ test('testing convertCsvToJson', () => {
     'a,b,c,d,e,f,g',
     '1,2,3,4,5,6,7',
     '9,8,7,6,5,4,3',
-    '100,5,2,7,aaaaaa,0,-55'
-  ]
+    '100,5,2,7,aaaaaa,0,-55',
+  ];
   const json = ParseTmcf.convertCsvToJson(lines);
 
   const expectedJson = [
-    {a:'1', b:'2', c:'3', d:'4', e:'5', f:'6', g:'7'},
-    {a:'9', b:'8', c:'7', d:'6', e:'5', f:'4', g:'3'},
-    {a:'100', b:'5', c:'2', d:'7', e:'aaaaaa', f:'0', g:'-55'},
-  ]
+    {a: '1', b: '2', c: '3', d: '4', e: '5', f: '6', g: '7'},
+    {a: '9', b: '8', c: '7', d: '6', e: '5', f: '4', g: '3'},
+    {a: '100', b: '5', c: '2', d: '7', e: 'aaaaaa', f: '0', g: '-55'},
+  ];
 
   expect(json).toStrictEqual(expectedJson);
 
@@ -100,15 +100,15 @@ test('testing convertCsvToJson', () => {
     'a,b,c,d,e,f,g',
     ',2,3,4,5,6,7',
     '9,8,7,6,5,4,',
-    '100,5,2,7,aaaaaa,,-55'
-  ]
+    '100,5,2,7,aaaaaa,,-55',
+  ];
   const json2 = ParseTmcf.convertCsvToJson(lines2);
 
   const expectedJson2 = [
-    {a:'', b:'2', c:'3', d:'4', e:'5', f:'6', g:'7'},
-    {a:'9', b:'8', c:'7', d:'6', e:'5', f:'4', g:''},
-    {a:'100', b:'5', c:'2', d:'7', e:'aaaaaa', f:'', g:'-55'},
-  ]
+    {a: '', b: '2', c: '3', d: '4', e: '5', f: '6', g: '7'},
+    {a: '9', b: '8', c: '7', d: '6', e: '5', f: '4', g: ''},
+    {a: '100', b: '5', c: '2', d: '7', e: 'aaaaaa', f: '', g: '-55'},
+  ];
 
   expect(json2).toStrictEqual(expectedJson2);
 });
